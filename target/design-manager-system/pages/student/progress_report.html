@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>进度汇报</title>
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <link rel="stylesheet" href="../../static/css/font.css"/>
+    <link rel="stylesheet" href="../../static/css/weadmin.css"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]->
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="weadmin-body">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目</label>
+                <div class="layui-input-block">
+                    <input type="text" name="title" lay-verify="required" placeholder="请输入题目(学号-日期-进度汇报，如xxxxx-20201205-进度汇报)" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <textarea name="content" id="progressReportBody" style="display: none;"></textarea>
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn" id="editReport" lay-filter="add" lay-submit="">提交</button>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript" charset="UTF-8" src="../../layui/layui.js"></script>
+    <script type="text/javascript" charset="UTF-8">
+        layui.use(['form','jquery','layedit','layer'],function () {
+            var form = layui.form;
+            var $ = layui.jquery;
+            var layedit = layui.layedit;
+            var layer = layui.layer;
+
+            var upId = localStorage.getItem("userId");
+
+            var editor = layedit.build('progressReportBody'); //建立编辑器
+
+
+            //监听表单提交
+            form.on('submit(add)', function (data) {
+                //获得编辑器内的内容
+                data.field.content = layedit.getContent(editor);
+                data.field.upId = upId;
+                $.ajax({
+                    url:"/file/addProcessReport",
+                    type:"post",
+                    data:data.field,
+                    success:function (feedback) {
+                        if (feedback.status === 200) {
+                            layer.msg("提交成功！");
+                        }else {
+                            layer.msg(feedback.msg);
+                        }
+                    }
+                });
+                return false;
+            });
+
+
+        });
+    </script>
+</body>
+</html>

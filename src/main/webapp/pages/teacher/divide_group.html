@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生分组</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../static/css/font.css">
+    <link rel="stylesheet" href="../../static/css/weadmin.css">
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]->
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="weadmin-body">
+
+        <div class="layui-tab">
+            <ul class="layui-tab-title">
+                <li class="layui-this">随机分组</li>
+                <li>自主分组</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <!--tab1 content-->
+                    <form class="layui-form" lay-filter="randomGrouping">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">
+                                分组班级
+                            </label>
+                            <div class="layui-input-inline">
+                                <select name="classId" id="classId">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">每组人数</label>
+                            <div class="layui-input-block">
+                                <div class="layui-input-inline">
+                                    <input type="number" id="memberNumber" name="memberNumber" lay-filter="number" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <button class="layui-btn" lay-filter="sure" lay-submit="">确定</button>
+                        </div>
+                    </form>
+                    <!--//tab1 content-->
+                </div>
+                <div class="layui-tab-item">
+                    <!--tab2 content-->
+                    <form class="layui-form" lay-filter="AutonomousGrouping">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">选择资料</label>
+                            <div class="layui-input-block">
+                                <div class="layui-input-line">
+                                    <input type="text" name="data" lay-verify="required" jq-error="请选择文件" placeholder="请选择分组名单文件" class="layui-input">
+                                </div>
+                                <button type="button" class="layui-btn layui-btn-primary" id="groupListFileBtn">选择文件</button>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <button class="layui-btn" id="submitFile" lay-filter="go" lay-submit="">确定</button>
+                        </div>
+                    </form>
+                    <!--//tab2 content-->
+                </div>
+            </div>
+        </div>
+
+
+    <script type="text/javascript" src="../../layui/layui.js"></script>
+    <script type="text/javascript" src="divide_group.js" ></script>
+</div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+{
+	"status": 0,
+	"msg": "ok",
+	"data": [{
+			"id": 1,
+			"name": "资料管理",
+			"icon": "&#xe705;",
+			"url": "",
+			"children": [{
+				"id": 2,
+				"name": "上传资料",
+				"icon": "",
+				"url": "../../pages/teacher/data_manage.html"
+			}, {
+				"id": 3,
+				"name": "课题管理",
+				"icon": "",
+				"url": "../../pages/teacher/topic_manage.html"
+			}, {
+				"id":4,
+				"name":"课程目标",
+				"icon":"",
+				"url":"../../pages/teacher/course_objective_add.html"
+			}]
+		},
+		{
+			"id": 5,
+			"name": "课题跟进",
+			"icon": "&#xe6ce;",
+			"url": "",
+			"children": [{
+				"id": 6,
+				"name": "查看汇报",
+				"icon": "",
+				"url": "../../pages/teacher/report_list.html"
+			}]
+		},
+		{
+			"id": 7,
+			"name": "总结",
+			"icon": "&#xe723;",
+			"url": "",
+			"children": [{
+				"id": 8,
+				"name": "评分",
+				"icon": "&#xe6b8;",
+				"url": "../../pages/teacher/student_list.html"
+			}, {
+				"id": 9,
+				"name": "成绩列表",
+				"icon": "",
+				"url": "../../pages/teacher/grade_list.html"
+			}]
+		}
+		
+	]
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>学生列表</title>
+		<meta name="renderer" content="webkit" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+		<link rel="stylesheet" href="../../static/css/font.css" />
+		<link rel="stylesheet" href="../../static/css/weadmin.css" />
+		<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+		<!--[if lt IE 9]->
+		  <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+		  <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+		<div class="weadmin-nav">
+			<span class="layui-breadcrumb">
+				<a href="javascript:;">首页</a> <a href="javascript:;">学生管理</a>
+				<a href="javascript:;"> <cite>已删班级</cite></a>
+			</span>
+			<a class="layui-btn layui-btn-sm" style="margin-top:3px;float:right" href="javascript:location.replace(location.href);"
+			 title="刷新">
+				<i class="layui-icon layui-icon-refresh"></i>
+			</a>
+		</div>
+
+		<div class="weadmin-body">
+
+
+			<table class="layui-table" id="delClassList" lay-filter="delClassList"></table>
+		</div>
+		<script type="text/html" id="listBar">
+			<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="resume">恢复</a>
+		</script>
+		<!--<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>-->
+		<script src="../../layui/layui.js" charset="utf-8"></script>
+		<script src="../../static/js/eleDel.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			layui.use(['table','form','jquery'],function(){
+				var table = layui.table;
+				var form = layui.form;
+				var $ = layui.jquery;
+				
+				var classInfor = table.render({
+					elem:'#delClassList',
+ 					url:'/class/getDelList',
+					page:true,
+					toolbar:true,
+					cols:[[
+						{field:'checkbox',type:'checkbox'}
+						,{field:'id',title:'ID',width:80,sort:true}
+						,{field:'claName',title:'班级名称',width:150,sort:true}
+						,{field:'claNumber',title:'人数',width:100}
+						,{field:'action',title:'操作',width:150,toolbar:'#listBar'}
+					]] 
+				});
+				
+				table.on('tool(delClassList)',function(obj){
+					var data = obj.data;//当前行数据
+					var layEvent = obj.event;//lay-event对应的值
+					var tr = obj.tr;//当前行tr的DOM对象
+					
+					if(layEvent == 'resume'){ //删除
+						layer.confirm('真的恢复行么', function(index){
+							//向服务端发送删除指令
+							$.ajax({
+								url:'/class/resumeById',
+								type:'post',
+								data:{'id':data.id},
+								success:function(callBack){
+									if(callBack.state == 200){
+										layer.msg("操作成功");
+										obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+									}else{
+										layer.msg(callBack.msg);
+									}
+									layer.close(index);
+								}
+							});
+						});
+					}
+					
+				});
+
+
+
+			});
+			
+		</script>
+	</body>
+	
+</html>

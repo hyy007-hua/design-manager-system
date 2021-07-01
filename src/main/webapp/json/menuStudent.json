@@ -1,0 +1,15 @@
+{
+  "status": 0,
+  "msg": "ok",
+  "data": [{
+    "id": 1,
+    "name": "课程选题",
+    "icon": "&#xe705;",
+    "url": "../../pages/student/choose_topic.html"
+  },{
+    "id": 2,
+    "name": "进度汇报",
+    "icon": "&#xe6ce;",
+    "url": "../../pages/student/progress_report.html"
+  }]
+}

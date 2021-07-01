@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chzu.dao.TbGradeMapper">
+  <resultMap id="BaseResultMap" type="com.chzu.model.TbGrade">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="grade_1" jdbcType="INTEGER" property="grade1" />
+    <result column="grade_2" jdbcType="INTEGER" property="grade2" />
+    <result column="grade_3" jdbcType="INTEGER" property="grade3" />
+    <result column="grade_4" jdbcType="INTEGER" property="grade4" />
+    <result column="grade_5" jdbcType="INTEGER" property="grade5" />
+    <result column="student_id" jdbcType="VARCHAR" property="studentId" />
+  </resultMap>
+
+  <resultMap id="GradeInfoMap" type="com.chzu.model.bo.GradeInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="grade_1" jdbcType="INTEGER" property="grade1" />
+    <result column="grade_2" jdbcType="INTEGER" property="grade2" />
+    <result column="grade_3" jdbcType="INTEGER" property="grade3" />
+    <result column="grade_4" jdbcType="INTEGER" property="grade4" />
+    <result column="grade_5" jdbcType="INTEGER" property="grade5" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="number" jdbcType="VARCHAR" property="number" />
+  </resultMap>
+
+  <select id="getByTeaId" resultMap="GradeInfoMap">
+    select g.id,g.grade_1,g.grade_2,g.grade_3,g.grade_4,g.grade_5,s.name,s.number
+     from tb_student s,tb_grade g
+     where s.id = g.student_id
+     and s.class_id in (
+        select t.cla_id
+        from tea_class t
+        where t.tea_id = #{teaId}
+      )
+  </select>
+
+  <select id="getByClaName" resultMap="GradeInfoMap">
+      select g.id,g.grade_1,g.grade_2,g.grade_3,g.grade_4,g.grade_5,s.name,s.number
+     from tb_student s,tb_grade g
+     where s.id = g.student_id
+     and s.class_id = (
+        select c.id from tb_class c
+        where c.cla_name = #{claName}
+     )
+  </select>
+
+</mapper>

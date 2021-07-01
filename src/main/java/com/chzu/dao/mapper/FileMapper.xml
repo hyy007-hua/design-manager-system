@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chzu.dao.FileMapper">
+  <resultMap id="BaseResultMap" type="com.chzu.model.bo.ReportFileInfo">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+  </resultMap>
+
+  <select id="getReportInfo" resultMap="BaseResultMap">
+    select file.id,file.file_name,stu.name from tb_file file,tb_student stu
+    where file.up_id = stu.id
+    <if test="claId != null and claId != ''">
+      and stu.class_id = #{claId}
+    </if>
+  </select>
+
+  <select id="getReportInfoByClaNameOrNumber" resultMap="BaseResultMap">
+    select file.id,file.file_name,stu.name from tb_file file,tb_student stu
+    where file.up_id = stu.id
+    <if test="claName != null and claName != ''">
+      and stu.class_id = (select cla.id from tb_class cla where cla.cla_name = #{claName})
+    </if>
+    <if test="number != null and number != ''">
+      and stu.number like "%"#{number}"%"
+    </if>
+  </select>
+</mapper>

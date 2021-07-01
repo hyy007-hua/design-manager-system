@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>登录--WeAdmin 1.0</title>
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./static/css/font.css">
+	<link rel="stylesheet" href="./static/css/weadmin.css">
+    <script src="./layui/layui.js" charset="utf-8"></script>
+	<script type="text/javascript" src="./static/js/consts.js"></script>
+</head>
+<body class="login-bg">
+    
+    <div class="login">
+        <div class="message">SchoolYearDesign 1.0-登录管理</div>
+        <div id="darkbannerwrap"></div>
+        
+        <form class="layui-form" >
+            <input name="username" placeholder="用户名"  type="text" lay-verify="required" class="layui-input" >
+            <hr class="hr15">
+            <input name="password" lay-verify="required" placeholder="密码"  type="password" class="layui-input">
+            <hr class="hr15">
+			<input type="image" src="/identifyCode/img" style="width:200px;height:50px"/>
+			<hr class="hr15">
+			<input name="checkCode" placeholder="验证码" type="text" lay-verify="required" />
+			<hr class="hr15">
+            <input type="radio" name="type" value="0" title="教师">
+            <input type="radio" name="type" value="1" title="学生" checked>
+            <input type="radio" name="type" value="2" title="管理员">
+            <hr class="hr15">
+            <input class="loginin" value="登录" lay-submit lay-filter="login" style="width:100%;" type="submit"/>
+            <hr class="hr20" >
+        </form>
+		<div style="position: relative;float: right;"><a href="/pages/module/forgetPwd.html" target="_blank">忘记密码 ?</a></div>
+    </div>
+
+    <script type="text/javascript">
+		
+        	layui.extend({
+				admin: '{/}./static/js/admin'
+			});
+            layui.use(['form','admin','layer'], function(){
+				var form = layui.form;
+                var $ = layui.jquery;
+                var layer = layui.layer;
+
+                //监听提交
+				form.on('submit(login)', function(data){
+                    $.ajax({
+                        url:"/login",
+                        type:"POST",
+                        data:data.field,
+                        success:function(callBack){
+                            console.log(callBack);
+                            if(callBack.status === 200){
+                                localStorage.setItem("userId",callBack.data.id);
+                                localStorage.setItem("username",callBack.data.username);
+                                localStorage.setItem("userType",callBack.data.type);
+                                localStorage.setItem("userInfo",JSON.stringify(callBack.data.info));
+                                if(callBack.data.type == 1){
+                                    location.href='./pages/student/main.html';
+                                }else if(callBack.data.type == 0){
+                                    location.href='./pages/teacher/main.html';
+                                }else{
+                                    location.href='./pages/admin/main.html';
+                                }
+                            }else{
+                                layer.msg(callBack.msg);
+                            }
+                        }
+                    });
+
+                    return false;
+				});
+
+            });   
+    </script>  
+    <!-- 底部结束 -->
+</body>
+</html>

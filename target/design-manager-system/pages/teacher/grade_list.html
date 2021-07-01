@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>成绩列表</title>
+    <meta name="renderer" content="webkit"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <link rel="stylesheet" href="../../static/css/font.css"/>
+    <link rel="stylesheet" href="../../static/css/weadmin.css"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]->
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="weadmin-nav">
+			<span class="layui-breadcrumb">
+				<a href="javascript:;">首页</a>
+				<a href="javascript:;">总结</a>
+				<a href="javascript:;">成绩列表</a>
+			</span>
+    <a class="layui-btn layui-btn-sm" style="margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon layui-icon-refresh"></i>
+    </a>
+</div>
+
+<div class="weadmin-body">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 we-search">
+            搜索：
+            <div class="layui-inline">
+                <select name="className" id="className" lay-filter="className" lay-verify="classNameCheck">
+                </select>
+            </div>
+
+            <button class="layui-btn" lay-submit lay-filter="searchGrade">
+                <i class="layui-icon layui-icon-search"></i>
+            </button>
+        </form>
+    </div>
+
+    <table class="layui-table" id="gradeList" lay-filter="gradeList"></table>
+</div>
+
+<!-- 表头工具栏 -->
+<script type="text/html" id="toolBar">
+    <button class="layui-btn layui-btn" lay-event="getTable">
+        <i class="layui-icon layui-icon-export"></i>达成度表格
+    </button>
+</script>
+
+<script type="text/javascript" src="../../layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript">
+    layui.extend({
+        admin: '{/}../../static/js/admin'
+    });
+    layui.use(['table', 'form', 'jquery', 'util', 'laypage', 'layer','admin'], function () {
+        var table = layui.table;
+        var form = layui.form;
+        var util = layui.util;
+        var laypage = layui.laypage;
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var admin = layui.admin;
+
+        var id = localStorage.getItem("userId");
+
+        //表单选择栏预填充
+        var str = '';
+        $.ajax({
+            url:'/class/getClassInfoByTeaId',
+            type:'post',
+            data:{"teaId":id},
+            success:function (callBack) {
+                if(callBack.status == 200){
+                    var data = callBack.data;
+                    for(var key in data){
+                        if(data[key]['isRight'] == "true")
+                            str+='<option value="'+data[key]['title']+'">'+data[key]['title']+'</option>';
+                    }
+                }else{
+                    str+='<option value="'+0+'">'+callBack.msg+'</option>';
+                }
+                $("#className").append(str);
+                form.render('select');
+            }
+        });
+
+        //表格渲染
+        table.render({
+            elem:'#gradeList',
+            url:'/grade/getGradeListByTeaId',
+            where:{"teaId":id},
+            page:true,
+            limits:[10,20,50],
+            limit:10,
+            toolbar:"#toolBar",
+            cols:[[
+                {field:'checkbox',type:'checkbox'}
+                ,{field:'id',title:'ID',width:180,sort:true}
+                ,{field:'number',title:'学号',width:110}
+                ,{field:'name',title:'姓名',width:100}
+                ,{field:'grade1',title:'课内实践',width:100}
+                ,{field:'grade2',title:'团队合作',width:100}
+                ,{field:'grade3',title:'考核答辩',width:100}
+                ,{field:'grade4',title:'系统实现',width:100}
+                ,{field:'grade5',title:'实践文档',width:100}
+            ]],
+            done:function (res,curr,count) {
+
+            }
+        });
+
+        //查询按钮点击响应
+        form.on('submit(searchGrade)',function(data){
+            table.reload('gradeList',{
+                url:'/grade/queryGradeListByClaName',
+                where:data.field
+            });
+            return false;
+        });
+
+        //表头工具栏事件监听
+        table.on('toolbar(gradeList)', function(obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            if (obj.event == 'getTable'){
+                var data = JSON.stringify(checkStatus.data);
+
+                $.ajax({
+                    url:'/grade/generateAchievementTable',
+                    type:'post',
+                    data:data,
+                    contentType : "application/json;charsetset=UTF-8",//设置数据编码格式
+                    dataType:"json",
+                    success:function (callBack) {
+                        if (callBack.status == 200) {
+                            console.log("选择的数据："+ JSON.stringify(callBack));
+                            window.open("/file/download?fileId=" + callBack.data );
+                        }
+                    }
+                });
+
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>

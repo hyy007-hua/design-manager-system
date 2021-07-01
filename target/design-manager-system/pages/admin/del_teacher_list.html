@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+	<!--
+	作者：github.com/WangEn
+	时间：2018-02-02
+	描述：修改form样式
+-->
+	<head>
+		<meta charset="UTF-8">
+		<title>已删教师</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../../static/css/font.css">
+		<link rel="stylesheet" href="../../static/css/weadmin.css">
+		<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+		<!--[if lt IE 9]->
+	      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+	      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+	    <![endif]-->
+	</head>
+
+	<body>
+		<div class="weadmin-nav">
+			<span class="layui-breadcrumb">
+				<a href="javascript:;">首页</a> <a href="javascript:;">教师管理</a>
+				<a href="javascript:;"><cite>已删教师</cite></a>
+			</span>
+			<a class="layui-btn layui-btn-sm" style="margin-top:3px;float:right" href="javascript:location.replace(location.href);"
+			 title="刷新">
+				<i class="layui-icon layui-icon-refresh"></i>
+			</a>
+		</div>
+		<div class="weadmin-body">
+			<div class="layui-row">
+				<form class="layui-form layui-col-md12 we-search">
+					搜索：
+					<div class="layui-inline">
+						<input class="layui-input" placeholder="开始日" name="start" id="start">
+					</div>
+					<div class="layui-inline">
+						<input class="layui-input" placeholder="截止日" name="end" id="end">
+					</div>
+					<div class="layui-inline">
+						<input type="text" name="teaNumber" placeholder="请输入教师编号" autocomplete="off" class="layui-input">
+					</div>
+					<button class="layui-btn" lay-submit="" lay-filter="searchDelTeacher">
+						<i class="layui-icon layui-icon-search"></i>
+					</button>
+				</form>
+			</div>
+			<table class="layui-table" id="delTeacherList" lay-filter="delTeacherList"></table>
+			
+		</div>
+		<script type="text/html" id="listBar">
+			<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="resume">恢复</a>
+		</script>
+		<script src="../../layui/layui.js" charset="utf-8"></script>
+		<script src="../../static/js/eleDel.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			layui.use(['table','form','util','jquery','layer'],function(){
+				var table = layui.table;
+				var form = layui.form;
+				var util = layui.util;
+				var $ = layui.jquery;
+				var layer = layui.layer;
+				
+				var delTeacherList = table.render({
+					elem:'#delTeacherList',
+					url:'/teacher/getDelAll',
+					page:true,
+					toolbar:true,
+					cols:[[
+						{field:'checkbox',type:'checkbox'}
+						,{field:'id',title:'ID',width:80,sort:true}
+						,{field:'teaNumber',title:'编号',width:100,sort:true}
+						,{field:'teaName',title:'姓名',width:100}
+						,{field:'teaPassword',title:'密码',width:100}
+						,{field:'teaEmail',title:'邮箱',width:100}
+						,{field:'teaSex',title:'性别',width:80}
+						,{field:'upTime',title:'上传时间',width:150,templet: function(data){
+								return util.toDateString(data.upTime, "yyyy-MM-dd HH:mm:ss");
+						}}
+						,{field:'statu',title:'状态',width:110,templet:function(){
+								return '<span class="layui-btn layui-btn-danger layui-btn-xs">已删除</span>';
+						}}
+						,{field:'action',title:'操作',width:150,toolbar:'#listBar'}
+					]] 
+				});
+				
+				form.on('submit(searchDelTeacher)',function(data){
+					delTeacherList.reload({
+						url:'/teacher/getDelByTimeOrNumber',
+						where:data.field
+					});
+					return false;
+				});
+				
+				table.on('tool(delTeacherList)',function(obj){
+					var data = obj.data;//当前行数据
+					var layEvent = obj.event;//lay-event对应的值
+					var tr = obj.tr;//当前行tr的DOM对象
+					
+					if(layEvent == 'resume'){ 
+						layer.confirm('真的恢复行么', function(index){
+
+							//向服务端发送指令
+							$.ajax({
+								url:'/teacher/resumeById',
+								type:'post',
+								data:{"id":data.id},
+								success:function(callBack){
+								    if(callBack.state == 200){
+                                        obj.del();
+                                        layer.msg("操作成功");
+                                    }else{
+								        layer.msg(callBack.msg);
+                                    }
+                                    layer.close(index);
+								}
+							});
+						});
+					}	
+				});
+				
+
+				
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chzu.dao.TbTargetMapper">
+  <resultMap id="BaseResultMap" type="com.chzu.model.TbTarget">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="target" jdbcType="VARCHAR" property="target" />
+    <result column="item" jdbcType="INTEGER" property="item" />
+    <result column="grade" jdbcType="INTEGER" property="grade" />
+    <result column="proportion" jdbcType="INTEGER" property="proportion" />
+    <result column="upId" jdbcType="VARCHAR" property="upid" />
+  </resultMap>
+</mapper>

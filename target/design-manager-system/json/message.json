@@ -1,0 +1,18 @@
+{
+  "mine": {
+    "username":"华亚勇",
+    "avatar":"http://tp4.sinaimg.cn/1665074831/180/5617130952/0",
+    "id":"030707471178543260",
+    "mine":true,
+    "content":"水电费",
+},
+  "to":{
+    "username":"赵媛莉",
+    "id":"030805060687791999",
+    "status":null,
+    "sign":null,
+    "avatar":"http://tp1.sinaimg.cn/5286730964/50/5745125631/0",
+    "name":"赵媛莉",
+    "type":"friend"
+  }
+}

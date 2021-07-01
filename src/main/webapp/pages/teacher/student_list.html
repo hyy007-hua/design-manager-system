@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>学生列表</title>
+	<meta name="renderer" content="webkit" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+	<link rel="stylesheet" href="../../static/css/font.css" />
+	<link rel="stylesheet" href="../../static/css/weadmin.css" />
+	<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+	<!--[if lt IE 9]->
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="weadmin-nav">
+			<span class="layui-breadcrumb">
+				<a href="javascript:;">首页</a>
+				<a href="javascript:;">总结</a>
+				<a href="javascript:;">评分</a>
+			</span>
+	<a class="layui-btn layui-btn-sm" style="margin-top:3px;float:right" href="javascript:location.replace(location.href);"
+	   title="刷新">
+		<i class="layui-icon layui-icon-refresh"></i>
+	</a>
+</div>
+
+<div class="weadmin-body">
+	<div class="layui-row">
+		<form class="layui-form layui-col-md12 we-search">
+			搜索：
+			<div class="layui-inline">
+                <select name="className" id="className" lay-filter="className" lay-verify="classNameCheck">
+                </select>
+			</div>
+			<div class="layui-inline">
+				<input type="text" name="number" placeholder="请输入学号" autocomplete="off" class="layui-input" />
+			</div>
+
+			<button class="layui-btn" lay-submit lay-filter="searchStudent">
+				<i class="layui-icon layui-icon-search"></i>
+			</button>
+		</form>
+	</div>
+
+	<table class="layui-table" id="studentList" lay-filter="studentList"></table>
+</div>
+<!-- 表头工具栏 -->
+<script type="text/html" id="toolBar">
+    <button class="layui-btn layui-btn" lay-event="divideGroup">
+        <i class="layui-icon layui-icon-note"></i>分组
+    </button>
+</script>
+<!-- 表行工具栏1 -->
+<script type="text/html" id="listBar">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="topicInfo">选题信息</a>
+</script>
+<!-- 表行工具栏2 -->
+<script type="text/html" id="listBar2">
+	<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="score">评分</a>
+</script>
+
+<script src="../../layui/layui.js" charset="utf-8"></script>
+<script src="../../static/js/eleDel.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	var studentInfo = {};
+	layui.use(['table','form','jquery','util','laypage','layer'],function(){
+		var table = layui.table;
+		var form = layui.form;
+		var util = layui.util;
+		var laypage = layui.laypage;
+		var $ = layui.jquery;
+		var layer = layui.layer;
+
+		var id = localStorage.getItem("userId");
+		//表单选择栏预填充
+        var str = '';
+        $.ajax({
+            url:'/class/getClassInfoByTeaId',
+            type:'post',
+			data:{"teaId":id},
+            success:function (callBack) {
+                if(callBack.status == 200){
+                    var data = callBack.data;
+                    for(var key in data){
+                    	if(data[key]['isRight'] == "true")
+                        	str+='<option value="'+data[key]['title']+'">'+data[key]['title']+'</option>';
+                    }
+                }else{
+                    str+='<option value="'+0+'">'+callBack.msg+'</option>';
+                }
+                $("#className").append(str);
+                form.render('select');
+            }
+        });
+
+        //表格渲染
+		table.render({
+			elem:'#studentList',
+			url:'/student/getListByTeaId',
+            where:{"teaId":id},
+			page:true,
+			limits:[10,20,50],
+			limit:10,
+			toolbar:"#toolBar",
+			cols:[[
+				{field:'checkbox',type:'checkbox'}
+				,{field:'id',title:'ID',width:80,sort:true}
+				,{field:'number',title:'学号',width:100,sort:true}
+				,{field:'name',title:'姓名',width:100}
+				,{field:'email',title:'邮箱',width:150}
+				,{field:'sex',title:'性别',width:80}
+				,{field:'className',title:'班级',width:100}
+				,{field:'upTime',title:'上传时间',width:180,templet: function(data){
+						return util.toDateString(data.createTime, "yyyy-MM-dd HH:mm:ss");
+				}}
+				,{field:'detail',title:'详细',width:100,toolbar:'#listBar'}
+				,{field:'action',title:'操作',width:70,toolbar:'#listBar2'}
+			]],
+			done:function (res,curr,count) {
+
+			}
+		});
+
+		table.on('toolbar(studentList)',function (obj) {
+           if(obj.event == "divideGroup"){
+			   WeAdminShow('构建分组','divide_group.html');
+           }
+        });
+
+		table.on('tool(studentList)',function(obj){
+			var data = obj.data;		//当前行数据
+			var layEvent = obj.event;//lay-event对应的值
+			var tr = obj.tr;//当前行tr的DOM对象
+			if(layEvent == 'topicInfo'){ //查看选题信息
+				//向服务端查询课题信息
+				$.ajax({
+					url:'/topic/queryInfoByStuId',
+					type:'post',
+					data:{"stuId":data.id},
+					success:function(callBack){
+						if(callBack.status == 200){
+							layer.open({
+								title: '该学生选择课题名称'
+								,content: callBack.data.topic
+							});
+						}else{
+							layer.msg(callBack.msg);
+						}
+					}
+				});
+
+			}
+			if(layEvent == 'score') { //评分
+				studentInfo = data;
+				WeAdminShow("评分","score.html");
+			}
+
+		});
+
+		table.on('checkbox(studentList)',function(obj){
+
+		});
+
+		//查询按钮点击响应
+		form.on('submit(searchStudent)',function(data){
+			table.reload('studentList',{
+				url:'/student/getByClaNameOrNumber',
+				where:{"claName":data.field.className,"number":data.field.number}
+			});
+			return false;
+		});
+
+
+	});
+
+</script>
+</body>
+
+</html>

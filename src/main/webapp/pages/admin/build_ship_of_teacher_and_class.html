@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>教师班级建立对应关系</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../../layui/css/layui.css">
+		<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+		<!--[if lt IE 9]->
+	      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+	      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+	    <![endif]-->
+	</head>
+	<body>
+		<div class="layui-card">
+			<div class="layui-card-header">
+				教师信息
+				<i class="layui-icon" style="color: #FF5722;">&#xe756;</i>
+			</div>
+			<div class="layui-card-body layui-text weadmin-text" id="view">
+								
+			</div>
+			<div id="transferView"></div>
+		</div>
+
+		<script src="../../layui/layui.js" charset="utf-8"></script>
+		<script>
+			layui.use(['layer', 'jquery','transfer',"laytpl"], function() {
+				var layer = layui.layer,
+					$ = layui.jquery,
+					transfer = layui.transfer,
+					laytpl = layui.laytpl;
+				//从上一页获取老师信息，变为json数据
+				var teacher = eval('('+parent.teacherInformation+')');
+
+				//模板渲染
+				var getTpl = viewContent.innerHTML
+						,view = document.getElementById('view');
+				laytpl(getTpl).render(teacher, function(html){
+					view.innerHTML = html;
+				});
+
+				console.log("教师id：" +JSON.stringify(teacher));
+				//从后台获得穿梭框数据
+				$.post({
+					url:"/class/getClassInfoByTeaId",
+					data:{'teaId':teacher.id},
+					success:function(callback){
+						var transferData = new Array();
+						var rightData = new Array();
+						if(callback.status == 200){
+							var data = callback.data;
+							for(var key in data){
+                                var item = {"value":data[key]["value"],"title":data[key]["title"],"disabled":"","checked":""};
+                                transferData.push(item);
+								if(data[key]["isRight"] == "true"){
+									rightData.push(data[key]["value"]);
+								}
+							}
+
+							//穿梭框渲染
+							transfer.render({
+								elem:"#transferView",
+								data:transferData,
+								value:rightData,
+								title:["未建立关系班级","已建立关系的班级"],
+								id:"classTransfer",
+								text:{
+									none:"无相关数据"
+								},
+								onchange:function (data,index) {
+									//穿梭框信息改变响应
+									//console.log("data:"+JSON.stringify(data));
+									var i = 0;
+									var classIds = "";
+									while (i<=data.length-1){
+										classIds += data[i].value+",";
+										i ++;
+									}
+									console.log(classIds);
+									if(index === 0){   //穿梭框向右传数据（构建关系）
+										$.ajax({
+											url:"/teacher/linkTeacherAndClass",
+											data:{"teaId":teacher.id,"classIds":classIds},
+											type:"post",
+											success:function (callback) {
+												if(callback.status === 200){
+													layer.msg("操作成功");
+												}else{
+													layer.msg(callback.msg);
+												}
+											}
+										});
+									}else {            //穿梭框向左传数据（删除关系）
+										$.ajax({
+											url:"/teacher/delLinkTeacherAndClass",
+											data:{"teaId":teacher.id,"classIds":classIds},
+											type:"post",
+											success:function (callback) {
+												if(callback.status === 200){
+													layer.msg("操作成功");
+												}else{
+													layer.msg(callback.msg);
+												}
+											}
+										});
+									}
+								}
+							});
+						}
+					}
+				});
+
+
+
+
+			});
+
+		</script>
+		<!-- 模板 -->
+		<script type="text/html" id="viewContent">
+			<h4>编号：{{=d.number}}</h4>
+			<h4>姓名：{{=d.name}}</h4>
+			<h4>邮箱：{{=d.email}}</h4>
+		</script>
+	</body>
+
+</html>

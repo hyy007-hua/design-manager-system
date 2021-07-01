@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+ 
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta name="viewport" content="width =device-width, initial-scale=1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Language" content="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>checkContent</title>
+    <meta content="victor" name="author"/>
+	<link rel="stylesheet" href="../../layui/css/layui.css" />
+    
+</head >
+ 
+<body οnlοad="load()" style="margin: auto">
+	<div class="layui-container">
+		<hr class="hr15">
+		<div class="layui-row layui-col-space10">
+			<div class="layui-col-md6">
+				<canvas width="100" height="30" id="captcha"></canvas>
+			</div>
+			<div class="layui-col-md6">
+				<form method="post" class="layui-form">
+					<input id="checkIn" name="checkCode" placeholder="请输入验证码"  type="text" lay-verify="required" class="layui-input" >
+				</form>
+			</div>
+		</div>
+	</div>
+	
+</body >
+<script type="text/javascript" src="../../static/js/captcha.js" ></script>
+	<script type="text/javascript">
+		var value1;
+		/*传值,参数配置值，选择性配置*/
+		var captcha = new Captcha({
+		    lineWidth: 1,   //线条宽度
+		    lineNum: 3,       //线条数量
+		    dotR: 2,          //点的半径
+		    dotNum: 20,       //点的数量
+		    preGroundColor: [10, 80],    //前景色区间
+		    backGroundColor: [150, 250], //背景色区间
+		    fontSize: 30,           //字体大小
+		    fontFamily: ['Georgia', '微软雅黑', 'Helvetica', 'Arial'],  //字体类型
+		    fontStyle: 'stroke',      //字体绘制方法，有fill和stroke
+		    content: '1234567890',  //验证码内容  abcdefghijklmnopqrstuvw
+		    length: 4    //验证码长度
+		}); // 传值
+		captcha.draw(document.querySelector('#captcha'), r => {
+			value1 = r;
+		});
+		var  callback = function(){
+			var value2 = document.getElementById("checkIn").value;
+			if(value1 == value2){
+				return true;
+			}else{
+				return false;
+			}
+		}
+	</script>
+</html >
